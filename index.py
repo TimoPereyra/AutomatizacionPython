@@ -3,7 +3,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 import time
+import re
 
+def is_valid_email(email):
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
 
 path = ('../../Downloads/chromedriver_win32/chromedriver.exe')
 webSite = ('https://www.grupo-global.com.ar/')
@@ -29,12 +33,18 @@ buttonContact = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.C
 buttonContact.click()
 # Esperamos a que aparezca el mensaje de error
 error_div = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input[name=email]")))
-error_message = error_div.text
 
-if error_message == 'Error en el envío del mensaje. Por favor inténtelo de nuevo más tarde.':
-    print('La prueba ha pasado')
-else:
-    print('La prueba ha fallado')
+required_attribute = error_div.get_attribute('required')
+email_value = email_field.get_attribute("value")
+print(required_attribute)
+print(email_value)
+print(is_valid_email(email_value))
+if required_attribute == 'true':
+    if is_valid_email(email_value) == False:
+     print('La prueba ha fallado dado que el campo es requerido y el email contiene errores')
+     
+    else:
+        print('Se envio todo correctamente')
 time.sleep(5)
 
 # Cerramos el navegador
